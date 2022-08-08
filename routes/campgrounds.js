@@ -25,19 +25,27 @@ router.get('/new', catchAsync(async (req, res) => {
 }));
 
 router.post('/', validateCampground, catchAsync(async (req, res, next) => {
-    // if (!req.body.Campground) throw new ExpressError('invalid campground data', 400);//incomplete data error, client-side\
     const campground = new Campground(req.body.campground);
     await campground.save();
+    req.flash('success', 'Campground created successfully!');
     res.redirect(`/campgrounds/${campground._id}`)
 }));
 
 router.get('/:id', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id).populate('reviews');
+    if (!campground) {
+        req.flash('error', 'Uh oh! Campground no longer available');
+        return res.redirect('/campgrounds');
+    }
     res.render('campgrounds/show', { campground });
 }));
 
 router.get('/:id/edit', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
+    if (!campground) {
+        req.flash('error', 'Uh oh! Campground no longer available');
+        return res.redirect('/campgrounds');
+    }
     res.render('campgrounds/edit', { campground });
 }));
 
