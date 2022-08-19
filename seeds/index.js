@@ -15,38 +15,37 @@ db.once("open", () => {
 
 const sample = array => array[Math.floor(Math.random() * array.length)]; 
 
-// call unsplash and return small image
-async function seedImg() {
-    try {
-        const res = await axios.get('https://api.unsplash.com/photos/random', {
-            params: {
-                client_id: 'FRf86VNXP0Zc1RNBrbOCswtRebKV1lqmQ6rfRtdSboY',
-                collections: 1114848,
-            },
-      })
-      return res.data.urls.small
-    } catch (err) {
-        console.error(err)
-    }
-}
-
 const seedDB = async () => {
     await Campground.deleteMany({})
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 150; i++) {
     // setup
-      const placeSeed = Math.floor(Math.random() * places.length)
-      const descriptorsSeed = Math.floor(Math.random() * descriptors.length)
       const citySeed = Math.floor(Math.random() * cities.length)
       const price = Math.floor(Math.random() *25) + 10;
     // seed data into campground
       const camp = new Campground({
-        author: '62f1e3f41fc1b17504b1fb32', 
-        image: await seedImg(),
-        title: `${descriptors[descriptorsSeed]} ${places[placeSeed]}`,
+        author: '62f1e3f41fc1b17504b1fb32',//Your User ID
         location: `${cities[citySeed].city}, ${cities[citySeed].state}`,
+        title: `${sample(descriptors)} ${sample(places)}`,
         description:
           'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, nihil tempora vel aspernatur quod aliquam illum! Iste impedit odio esse neque veniam molestiae eligendi commodi minus, beatae accusantium, doloribus quo!',
-        price
+        price,
+        geometry: {
+            type: 'Point',
+            coordinates: [
+                cities[citySeed].longitude,
+                cities[citySeed].latitude
+            ]
+        },
+        images: [
+            {
+                url: 'https://res.cloudinary.com/mrmatty/image/upload/v1660543597/YelpCamp/xhhr7oqkovgld4bnckfr.jpg',
+                filename: 'YelpCamp/xhhr7oqkovgld4bnckfr',
+              },
+              {
+                url: 'https://res.cloudinary.com/mrmatty/image/upload/v1660543597/YelpCamp/ne3qpxdc0vrzq14kvlfc.jpg',
+                filename: 'YelpCamp/ne3qpxdc0vrzq14kvlfc',
+              }
+        ]
       })
    
       await camp.save()
